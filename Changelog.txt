@@ -1,0 +1,2 @@
+
+- Optimized my changes to the translation system
