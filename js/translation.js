@@ -6,6 +6,9 @@ var translationReady = false;
 
 var translationEvent = new Event('translationReady');
 
+const card_number_color_classes = ['cost-color', 'atk-color', 'hp-color'];
+const card_number_regex = /[\d\.\,]+/gm;
+
 function loadTranslation(language) {
 
     var langs = ["en"];
@@ -21,10 +24,6 @@ function loadTranslation(language) {
     $.i18n().debug = false;
     $.i18n().locale = language;
     $.i18n().load(languagesObject).done(function () {
-        langs.forEach((lang) => {
-            processLanguage(lang);
-        })
-
         $.extend($.i18n.parser.emitter, {
             ucp: function (nodes) {
                 return '<span class="ucp">' + nodes[0] + '</span>';
@@ -175,7 +174,17 @@ function loadTranslation(language) {
                 return `<span class="${nodes[0]}">${nodes[1]}</span>`;
             },
             switch_left: SwitchPartHelper("Left"),
-            switch_right: SwitchPartHelper("Right")
+            switch_right: SwitchPartHelper("Right"),
+            stats: (nodes) => {
+                if (nodes.length < 2 || nodes.length > 3) {
+                    return "<span class='rainbowText'>ERROR!</span>";
+                }
+                for (var i=nodes.length-1; i >= 0; i--) {
+                    var color_class = card_number_color_classes[i + (card_number_color_classes.length - nodes.length)];
+                    nodes[i] = nodes[i].replaceAll(card_number_regex, (number) => `<span class="${color_class}">${number}</span>`);
+                }
+                return nodes.join("/");
+            }
         });
 
         $('body').i18n();
@@ -304,64 +313,16 @@ function htmlDecode(input) {
 
 // elytrafae additions //
 
-var card_numbers_regex = /[+-]?(\d+)\/[+-]?(\d+)(?:\/[+-]?(\d+))?/gm;
-var card_number_color_classes = ['cost-color', 'atk-color', 'hp-color'];
-
-function isKeyEffectDesc(key) {
-    if (key.startsWith("card-")) {
-        return !key.startsWith("card-name-");
-    }
-    if (key.startsWith("artifact-")) {
-        return !key.startsWith("artifact-name-");
-    }
-    if (key.startsWith("kw-") || key.startsWith("soul-")) {
-        return key.endsWith("-desc");
-    }
-    return key.startsWith("status-");
-}
-
-function processLanguage(lan = "en") {
-    var messages = $.i18n.messageStore.messages[lan];
-    for (var key in messages) {
-        if (isKeyEffectDesc(key)) {
-            $.i18n.messageStore.set(lan, {[key]: processString(messages[key])});
-        }
-    }
-}
-
-function processString(text) {
-    text = text.replaceAll(card_numbers_regex, StatColorRegexProcessor);
-    return text;
-}
-
-function StatColorRegexProcessor(full, stat1, stat2, stat3) {
-    //console.log(full, stat1, stat2, stat3);
-    var parts = full.split("/");
-
-    for (var i=0; i < parts.length; i++) {
-        var color_class = card_number_color_classes[i + (card_number_color_classes.length - parts.length)];
-        //console.log("Color class: ", color_class);
-        var prefix = '';
-        if (parts[i][0] == "+" || parts[i][0] == "-") {
-            prefix = parts[i][0];
-            parts[i] = parts[i].substr(1);
-        }
-        parts[i] = prefix + '<span class="' + color_class + '">' + parts[i] + '</span>';
-        //console.log("parts[i]", i, parts[i]);
-    }
-    //console.log(parts);
-    return parts.join("/");
-}
-
-function SwitchPartHelper(className) {
+// Ok, Feildmaster gave me ideas to clean this one up
+function SwitchPartHelper(dir) {
     return (nodes) => {
-        var opacity = Number(nodes[0]);
-        if (isNaN(opacity)) {
-            opacity = 1;
+        const text = nodes[1];
+        const opacity = isNaN(Number(nodes[0])) ? 1 : Number(nodes[0]);
+        const classes = [`SwitchHighlight_${dir}`];
+        if (opacity <= 0) {
+            classes.push('invisible');
         }
-        var classPart = `class="SwitchHighlight_${className}" `;
-        var text = nodes[1];
-        return `<span ${classPart}style="${opacity <= 0 ? "display:none;" : ""}">${text}</span>`;
+        return `<span class="${classes.join(" ")}">${text}</span>`;
     }
 }
 
