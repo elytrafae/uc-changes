@@ -8,219 +8,132 @@ function initHelper() {
     });
 }
 
-class PowerInfoGroup {
+class AbstractPowerInfo {
 
-    static ALL_GROUPS = [];
-    static ANY = new PowerInfoGroup((card) => true);
-    static MONSTER_ONLY = new PowerInfoGroup((card) => card.typeCard === 0);
-    static SPELL_ONLY = new PowerInfoGroup((card) => card.typeCard === 1);
+    /**@type {AbstractPowerInfo[]} */
+    static ALL_POWER_INFOS = [];
 
-    constructor(/**@type {Function}*/ cond = (card) => true) {
-        /**@type {Function}*/
-        this.condition = cond;
-        PowerInfoGroup.ALL_GROUPS.push(this);
+    constructor() {
+        AbstractPowerInfo.ALL_POWER_INFOS.push(this);
+    }
+
+    doesApply(card) {
+        return false;
+    }
+
+    getPowerImage(card) {
+        return "ERROR!";
+    }
+
+    getTranslationKey(card) {
+        return "ERROR!";
+    }
+
+    getTranslateArguments(card) {
+        return [];
+    }
+
+    hasNumber() {
+        return false;
+    }
+
+    getNumber(card) {
+        return 0;
+    }
+
+    render(card) {
+        var translateArguments = this.getTranslateArguments(card).map(str => base64EncodeUnicode(str));
+        return `
+            <div class="infoPowersContainer">
+                <img power="${this.getPowerImage(card)}" class="infoPowers helpPointer" src="images/powers/${this.getPowerImage(card)}.png" oncontextmenu="displayStatusStringKey(${formatArgs(this.getTranslationKey(card), translateArguments)});">
+                ${this.hasNumber() ? `<span class="infoPowersDetails helpPointer" oncontextmenu="displayStatusStringKey(${formatArgs(this.getTranslationKey(card), translateArguments)});">${this.getNumber(card)}</span>` : ""}
+            </div>
+        `;
     }
 
 }
 
-class PowerInfoArgs {
+class BasicPowerInfo extends AbstractPowerInfo {
 
-    static EMPTY = new PowerInfoArgs();
+    constructor(/**@type {string} */ name) {
+        super();
+        this.name = name;
+    }
 
-    constructor(args = [], number = null) {
-        this.args = args;
-        this.number = number;
+    doesApply(card) {
+        return Boolean(card[this.name]);
+    }
+
+    getPowerImage(card) {
+        return this.name;
+    }
+
+    getTranslationKey(card) {
+        return `status-${this.name.toLowerCase()}`;
     }
 
 }
 
-class PowerInfo {
-
-    /**@type {Map<PowerInfoGroup,PowerInfo[]>} */
-    static ALL_POWER_INFOS = new Map();
-
-    static setUpAllPowerInfos() {
-        PowerInfoGroup.ALL_GROUPS.forEach((group) => {
-            this.ALL_POWER_INFOS.set(group, []);
-        })
+class StatPowerInfo extends AbstractPowerInfo {
+    constructor(/**@type {string}*/ name, /**@type {string}*/ baseName) {
+        super();
+        this.name = name;
+        this.baseName = baseName;
     }
-
-    constructor(/**@type {Function}*/ cond = (card) => true, /**@type {string} */ powerId, /**@type {string} */ transKey = powerId, /**@type {PowerInfoGroup} */ group = PowerInfoGroup.ANY) {
-        this.condition = cond;
-        this.powerId = powerId;
-        this.transKey = transKey;
-        PowerInfo.ALL_POWER_INFOS.get(group).push(this);
+    doesApply(card) {
+        return card[this.name] !== card[this.baseName];
     }
-
-    getPowerId(card) {
-        return this.powerId;
-    }
-
-    getTransKey(card) {
-        return this.transKey;
-    }
-
-    getArguments(card) {
-        return PowerInfoArgs.EMPTY;
-    }
-
-}
-
-class StatPowerInfo extends PowerInfo {
-    constructor(/**@type {string}*/ property, /**@type {string}*/ origProperty, /**@type {string} */ powerIdPart, /**@type {string} */ transKeyPart = powerId, /**@type {boolean} */ isInverted = false, /**@type {PowerInfoGroup} */ group) {
-        super((card) => card[this.property] !== card[this.origProperty], powerIdPart, transKeyPart, group);
-        this.property = property;
-        this.origProperty = origProperty;
-    }
-    getPowerId(card) {
+    getPowerImage(card) {
         var isBuffed = card[this.property] > card[this.origProperty];
-        return (isBuffed && !isInverted ? "bonus" : "malus") + this.powerId;
+        return (isBuffed ? "plus_" : "minus_") + this.name;
     }
-    getTransKey(card) {
+    getTranslationKey(card) {
         var isBuffed = card[this.property] > card[this.origProperty];
-        return `status-${this.transKey}-${(isBuffed ? "buff" : "debuff")}`;
+        return `status-${this.name.toLowerCase()}-${(isBuffed ? "buff" : "debuff")}`;
     }
-    getArguments(card) {
-        var prop = card[this.property];
-        return new PowerInfoArgs([prop], null);
+    getTranslateArguments(card) {
+        return [card[this.baseName]];
+    }
+}
+
+class NumberedPowerInfo extends BasicPowerInfo {
+    getTranslateArguments(card) {
+        return [card[this.name]];
+    }
+    hasNumber() {return true;}
+    getNumber(card) {
+        return card[this.name];
     }
 }
 
-class NumberedPowerInfo extends PowerInfo {
-    constructor(/**@type {string}*/ property, /**@type {string} */ powerId, /**@type {string} */ transKey = powerId, /**@type {PowerInfoGroup} */ group) {
-        super((card) => card[this.property], powerId, transKey, group);
-        this.property = property;
-    }
-    getArguments(card) {
-        var prop = card[this.property];
-        return new PowerInfoArgs([prop], prop);
+class DTPowerInfo extends BasicPowerInfo {
+    doesApply(card) {
+        return card.rarity === "DETERMINATION";
     }
 }
-PowerInfo.setUpAllPowerInfos();
 
-const CARD_POWER_INFOS = {
-    COST: new StatPowerInfo("cost", "otiginalCost", "Cost", "cost", true, PowerInfoGroup.ANY),
-    DETERMINATION: new PowerInfo((card) => card.rarity === "DETERMINATION", "determination", "status-determination", PowerInfoGroup.ANY),
-    LOOP: new NumberedPowerInfo("loop", "loop", "status-loop", PowerInfoGroup.ANY),
-    // Monsters only
-    TAUNT: new PowerInfo((card) => card.taunt, "taunt", "status-taunt", PowerInfoGroup.MONSTER_ONLY),
-    CHARGE: new PowerInfo((card) => card.charge, "charge", "status-charge", PowerInfoGroup.MONSTER_ONLY),
-    HASTE: new PowerInfo((card) => card.haste, "haste", "status-haste", PowerInfoGroup.MONSTER_ONLY),
-    ATK: new StatPowerInfo("attack", "originalAttack", "Atk", "atk", false, PowerInfoGroup.MONSTER_ONLY),
-    HP: new StatPowerInfo("maxHp", "originalHp", "Hp", "hp", false, PowerInfoGroup.MONSTER_ONLY),
-};
-
-function setInfoPowers($card, card) {
-    $card.find('.cardStatus').empty();
-    var powers = [];
-    if (card.typeCard === 0) {
-        if (card.attack > card.originalAttack) {
-            powers.push("bonusAtk");
-            powersStringKeys.push('status-atk-buff');
-            powersStringArgs.push([card.originalAttack]);
-            powersStringNumbers.push(null);
-        }
-        if (card.attack < card.originalAttack) {
-            powers.push("malusAtk");
-            powersStringKeys.push('status-atk-debuff');
-            powersStringArgs.push([card.originalAttack]);
-            powersStringNumbers.push(null);
-        }
-        if (card.maxHp > card.originalHp) {
-            powers.push("bonusHp");
-            powersStringKeys.push('status-hp-buff');
-            powersStringArgs.push([card.originalHp]);
-            powersStringNumbers.push(null);
-        }
-        if (card.paralyzed) {
-            powers.push("paralyzed");
-            powersStringKeys.push('status-paralyzed');
-            powersStringArgs.push([]);
-            powersStringNumbers.push(null);
-        }
-        if (card.candy) {
-            powers.push("candy");
-            powersStringKeys.push('status-candy');
-            powersStringArgs.push([]);
-            powersStringNumbers.push(null);
-        }
-        if (card.kr) {
-            powers.push("poison");
-            powersStringKeys.push('status-kr');
-            powersStringArgs.push([]);
-            powersStringNumbers.push(null);
-        }
-        if (card.armor > 0) {
-            powers.push("armor");
-            powersStringKeys.push('status-armor');
-            powersStringArgs.push([]);
-            powersStringNumbers.push(null);
-        }
-        if (card.dodge > 0) {
-            powers.push("dodge");
-            powersStringKeys.push('status-dodge');
-            powersStringArgs.push([card.dodge]);
-            powersStringNumbers.push(card.dodge);
-        }
-        if (card.burn > 0) {
-            powers.push("burn");
-            powersStringKeys.push('status-burn');
-            powersStringArgs.push([card.burn]);
-            powersStringNumbers.push(card.burn);
-        }
-        if (card.cantAttack) {
-            powers.push("cantAttack");
-            powersStringKeys.push('status-disarmed');
-            powersStringArgs.push([]);
-            powersStringNumbers.push(null);
-        }
-        if (card.anotherChance) {
-            powers.push("anotherChance");
-            powersStringKeys.push('status-another-chance');
-            powersStringArgs.push([]);
-            powersStringNumbers.push(null);
-        }
-        if (card.invulnerable) {
-            powers.push("invulnerable");
-            powersStringKeys.push('status-invulnerable');
-            powersStringArgs.push([]);
-            powersStringNumbers.push(null);
-        }
-        if (card.transparency) {
-            powers.push("transparency");
-            powersStringKeys.push('status-transparency');
-            powersStringArgs.push([]);
-            powersStringNumbers.push(null);
-        }
-        if (card.silence) {
-            powers.push("silenced");
-            powersStringKeys.push('status-silenced');
-            powersStringArgs.push([]);
-            powersStringNumbers.push(null);
-        }
-        if (card.caughtMonster !== undefined) {
-            powers.push("box");
-            powersStringKeys.push('status-caught');
-            var caughtCardTranslated = $.i18n('{{CARD:' + card.caughtMonster.fixedId + '|1}}');
-            powersStringArgs.push([caughtCardTranslated, card.caughtMonster.owner.username]);
-            powersStringNumbers.push(null);
-        }
-        if (card.shockEnabled) {
-            powers.push("shock");
-            powersStringKeys.push('status-shock');
-            powersStringArgs.push([]);
-            powersStringNumbers.push(null);
-        }
-        if (card.supportEnabled) {
-            powers.push("support");
-            powersStringKeys.push('status-support');
-            powersStringArgs.push([]);
-            powersStringNumbers.push(null);
-        }
+class CatchPowerInfo extends BasicPowerInfo {
+    getTranslateArguments(card) {
+        var caughtCardTranslated = $.i18n('{{CARD:' + card.caughtMonster.fixedId + '|1}}');
+        return [caughtCardTranslated, card.caughtMonster.owner.username];
     }
-    if (card.creatorInfo !== undefined && card.creatorInfo.typeCreator >= 0) {
-        powers.push("created");
-        powersStringKeys.push('status-created');
+}
+
+class CreatorPowerInfo extends AbstractPowerInfo {
+
+    doesApply(card) {
+        return card.creatorInfo !== undefined && card.creatorInfo.typeCreator >= 0;
+    }
+
+    getPowerImage(card) {
+        return "created";
+    }
+
+    getTranslationKey(card) {
+        return "status-created";
+    }
+
+    getTranslateArguments(card) {
         var creatorCardTranslated = '';
         if (card.creatorInfo.typeCreator === 0) {
             creatorCardTranslated = $.i18n('{{CARD:' + card.creatorInfo.id + '|1}}');
@@ -229,32 +142,63 @@ function setInfoPowers($card, card) {
         } else if (card.creatorInfo.typeCreator === 2) {
             creatorCardTranslated = $.i18n('{{SOUL:' + card.creatorInfo.name + '}}');
         }
-        powersStringArgs.push([creatorCardTranslated]);
-        powersStringNumbers.push(null);
+        return [creatorCardTranslated];
     }
-    for (var i = 0; i < powersStringArgs.length; i++) {
-        var args = powersStringArgs[i];
-        for (var j = 0; j < args.length; j++) {
-            args[j] = base64EncodeUnicode(args[j]);
+
+}
+
+const CARD_POWER_INFOS = {
+    COST: new StatPowerInfo("cost", "originalCost"),
+    DETERMINATION: new DTPowerInfo("determination"),
+    LOOP: new NumberedPowerInfo("loop"),
+    // Monsters only
+    TAUNT: new BasicPowerInfo("taunt"),
+    CHARGE: new BasicPowerInfo("charge"),
+    HASTE: new BasicPowerInfo("haste"),
+    ATTACK: new StatPowerInfo("attack", "originalAttack"),
+    MAXHP: new StatPowerInfo("maxHp", "originalHp"),
+    PARALYZED: new BasicPowerInfo("paralyzed"),
+    CANDY: new BasicPowerInfo("candy"),
+    KR: new BasicPowerInfo("kr"),
+    ARMOR: new BasicPowerInfo("armor"),
+    DODGE: new NumberedPowerInfo("dodge"),
+    BURN: new NumberedPowerInfo("burn"), // Why am I even keeping this? It's broken!
+    DISARMED: new BasicPowerInfo("cantAttack"),
+    ANOTHER_CHANCE: new BasicPowerInfo("anotherChance"), // This is broken anyway, so I don't care that I broke the translation key
+    INVULNERABLE: new BasicPowerInfo("invulnerable"),
+    TRANSPARENCY: new BasicPowerInfo("transparency"),
+    SILENCED: new BasicPowerInfo("silence"),
+    CAUGHT_MONSTER: new CatchPowerInfo("caughtMonster"),
+    SHOCK_ENABLED: new BasicPowerInfo("shockEnabled"),
+    SUPPORT_ENABLED: new BasicPowerInfo("supportEnabled"),
+    // Last Ones
+    CREATOR: new CreatorPowerInfo()
+};
+
+function setInfoPowers($card, card) {
+    if (!card) {
+        return;
+    }
+    var $cardStatusContainer = $card.find('.cardStatus');
+    var statusHTML = "";
+    AbstractPowerInfo.ALL_POWER_INFOS.forEach(powerInfo => {
+        if (powerInfo.doesApply(card)) {
+            statusHTML += powerInfo.render(card);
         }
+    });
+    $cardStatusContainer.html(statusHTML);
+
+    // Tribes
+    var tribes = [...card.tribes];
+    if (tribes.indexOf("ALL") > -1) {
+        tribes = ["ALL"];
     }
-    for (var i = 0; i < powersStringKeys.length; i++) {
-        var $cardContainerImage = $card.find('.cardStatus');
-        $cardContainerImage.append('<img style="right: ' + (i * 20) + 'px;" power="' + powers[i] + '" class="infoPowers helpPointer" src="images/powers/' + powers[i] + '.png" oncontextmenu="displayStatusStringKey(' + formatArgs(powersStringKeys[i], powersStringArgs[i]) + ');">');
-        if (powersStringNumbers[i] !== null) {
-            $cardContainerImage.append('<span style="right: ' + (i * 20) + 'px;" class="infoPowersDetails helpPointer" oncontextmenu="displayStatusStringKey(' + formatArgs(powersStringKeys[i], powersStringArgs[i]) + ');">' + powersStringNumbers[i] + '</span>');
-        }
+    var $cardTribeContainer = $card.find('.cardTribes');
+    var tribesHTML = "";
+    for (var i = 0; i < tribes.length; i++) {
+        tribesHTML += `<img class="tribe helpPointer" src="images/tribes/${tribes[i]}.png" oncontextmenu="showTribeCards('${tribes[i]}');"/>`;
     }
-    var tribes = card.tribes;
-    if (tribes.indexOf('ALL') > -1) {
-        var $cardContainerImage = $card.find('.cardTribes');
-        $cardContainerImage.append('<img style="right: 4px;" class="tribe helpPointer" src="images/tribes/ALL.png" oncontextmenu="showTribeCards(\'ALL\');"/>');
-    } else {
-        for (var i = 0; i < tribes.length; i++) {
-            var cardContainerImage = $card.find('.cardTribes');
-            cardContainerImage.append('<img style="right: ' + (i * 20) + 'px;" class="tribe helpPointer" src="images/tribes/' + tribes[i] + '.png" oncontextmenu="showTribeCards(\'' + tribes[i] + '\');"/>');
-        }
-    }
+    $cardTribeContainer.html(tribesHTML);
 }
 function formatArgs(key, stringArgs) {
     var finalString = "'" + key + "'";
