@@ -1,3 +1,5 @@
+// DO not use this!
+
 var effects = {};
 var tribeDialogOpen = false;
 function initHelper() {

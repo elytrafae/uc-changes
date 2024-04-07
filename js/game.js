@@ -264,7 +264,7 @@ function runEvent(data) {
                     customDisplay = '<span class="artifact-custom">' + customValue + '</span>';
                 }
 
-                $('#user' + key + ' .artifacts').append('<span class="artifact-group"><img class="artifact-img ' + disabledClass + '" name="' + artifactsList[i].name + '" image="' + artifactsList[i].image + '" legendary="' + artifactsList[i].legendary + '" artifactId="' + artifactsList[i].id + '" src="images/artifacts/' + artifactsList[i].image + '.png"/> ' + customDisplay + '</span>');
+                $('#user' + key + ' .artifacts').append('<span class="artifact-group"><img class="artifact-img ' + disabledClass + '" name="' + artifactsList[i].name + '" image="' + artifactsList[i].image + '" legendary="' + artifactsList[i].legendary + '" artifactId="' + artifactsList[i].id + '" src="aprilimages/artifacts/' + artifactsList[i].image + '.png"/> ' + customDisplay + '</span>');
             }
 
         }
@@ -420,7 +420,7 @@ function runEvent(data) {
 
         $card.find('.cardCost').html(card.cost);
 
-        $card.find('.cardImage').html('<img src="images/cards/' + card.image + '.png" draggable="false"/>');
+        $card.find('.cardImage').html('<img src="aprilimages/cards/' + card.image + '.png" draggable="false"/>');
 
         setInfoPowers($card, card);
         updateCardVisual($card, card);
@@ -871,7 +871,7 @@ function runEvent(data) {
             $('.rainbowAvatar').hide();
             $('header').hide();
             $('#phase2').hide();
-            $('body').css('background-image', 'url(images/99.png)');
+            $('body').css('background-image', 'url(aprilimages/99.png)');
             $('body').css('background-repeat', 'repeat');
             $('body').css('background-size', 'cover');
             $('#gameOver').show();
@@ -887,7 +887,7 @@ function runEvent(data) {
                 $('#phase2').hide();
                 $('body').css('background', '#000');
                 $('#gameOver').show();
-                $('#soul').append('<img src="images/broke.gif" draggable="false"/>');
+                $('#soul').append('<img src="aprilimages/broke.gif" draggable="false"/>');
                 audio.play();
 
             }
@@ -1132,8 +1132,8 @@ function runEvent(data) {
         $('#board .card').css('opacity', 0.5);
         $('#board #' + data.attackMonster).css('opacity', 1).addClass('fight');
         $('#board #' + data.defendMonster).css('opacity', 1).addClass('fight');
-        $('#' + data.attackMonster + ' .cardAction').append('<img class="infoFight" src="/images/cardAssets/sword.png">');
-        $('#' + data.defendMonster + ' .cardAction').append('<img class="infoFight" src="/images/cardAssets/shield.png">');
+        $('#' + data.attackMonster + ' .cardAction').append('<img class="infoFight" src="/aprilimages/cardAssets/sword.png">');
+        $('#' + data.defendMonster + ' .cardAction').append('<img class="infoFight" src="/aprilimages/cardAssets/shield.png">');
         $('.card').removeClass('canPlay');
 
         setTimeout(function () {
@@ -1160,7 +1160,7 @@ function runEvent(data) {
 
         $('#board .card').css('opacity', 0.5);
         $('#board #' + data.attackMonster).css('opacity', 1).addClass('fight');
-        $('#' + data.attackMonster + ' .cardAction').append('<img class="infoFight" src="/images/cardAssets/sword.png">');
+        $('#' + data.attackMonster + ' .cardAction').append('<img class="infoFight" src="/aprilimages/cardAssets/sword.png">');
         $('#user' + data.defendPlayer + ' .centerPart').addClass('fight');
         $('.card').removeClass('canPlay');
 
@@ -1478,7 +1478,7 @@ function bypassQueueEvent(data) {
             numBackground = 'tuto';
         }
 
-        $('body').css('background', '#000 url(\'images/backgrounds/' + numBackground + '.png\') no-repeat');
+        $('body').css('background', '#000 url(\'aprilimages/backgrounds/' + numBackground + '.png\') no-repeat');
         $('body').css('background-size', 'cover');
 
         $('#phase1').fadeOut(100);
@@ -1503,8 +1503,8 @@ function bypassQueueEvent(data) {
         $('#enemyUsername').addClass(data.enemySoul);
         $('#yourUsername').attr('data-soul', data.yourSoul);
         $('#enemyUsername').attr('data-soul', data.enemySoul);
-        $('#yourSoulImg').append('<img onclick="soulInfo($(this).attr(\'data-soul\'));" data-soul="' + data.yourSoul + '" class="' + data.yourSoul + '" src="images/souls/' + data.yourSoul + '.png" title="' + data.yourSoul + '"/>');
-        $('#enemySoulImg').append('<img onclick="soulInfo($(this).attr(\'data-soul\'));" data-soul="' + data.enemySoul + '" class="' + data.enemySoul + '" src="images/souls/' + data.enemySoul + '.png" title="' + data.enemySoul + '"/>');
+        $('#yourSoulImg').append('<img onclick="soulInfo($(this).attr(\'data-soul\'));" data-soul="' + data.yourSoul + '" class="' + data.yourSoul + '" src="aprilimages/souls/' + data.yourSoul + '.png" title="' + data.yourSoul + '"/>');
+        $('#enemySoulImg').append('<img onclick="soulInfo($(this).attr(\'data-soul\'));" data-soul="' + data.enemySoul + '" class="' + data.enemySoul + '" src="aprilimages/souls/' + data.enemySoul + '.png" title="' + data.enemySoul + '"/>');
         turn = turnGame;
 
         if (userId === userTurn) {
@@ -1523,15 +1523,15 @@ function bypassQueueEvent(data) {
         var enemyAvatar = JSON.parse(data.enemyAvatar);
 
         if (data.yourShinyAvatar) {
-            $('.mainContent').prepend('<img id="yourShinyAvatar" src="images/shinyAvatar.gif" class="rainbowAvatar" draggable="false">');
+            $('.mainContent').prepend('<img id="yourShinyAvatar" src="aprilimages/shinyAvatar.gif" class="rainbowAvatar" draggable="false">');
         }
 
         if (data.enemyShinyAvatar) {
-            $('.mainContent').prepend('<img id="enemyShinyAvatar" src="images/shinyAvatar.gif" class="rainbowAvatar" draggable="false">');
+            $('.mainContent').prepend('<img id="enemyShinyAvatar" src="aprilimages/shinyAvatar.gif" class="rainbowAvatar" draggable="false">');
         }
 
-        $('.mainContent').prepend('<img id="yourAvatar" class="avatar ' + yourAvatar.rarity + ' pointer" src="images/avatars/' + yourAvatar.image + '.png" draggable="false" onclick="showGameEmotes();"/>');
-        $('.mainContent').prepend('<img id="enemyAvatar" class="avatar ' + enemyAvatar.rarity + ' pointer" src="images/avatars/' + enemyAvatar.image + '.png" draggable="false" onclick="toggleMute();"/>');
+        $('.mainContent').prepend('<img id="yourAvatar" class="avatar ' + yourAvatar.rarity + ' pointer" src="aprilimages/avatars/' + yourAvatar.image + '.png" draggable="false" onclick="showGameEmotes();"/>');
+        $('.mainContent').prepend('<img id="enemyAvatar" class="avatar ' + enemyAvatar.rarity + ' pointer" src="aprilimages/avatars/' + enemyAvatar.image + '.png" draggable="false" onclick="toggleMute();"/>');
 
         //ProfileSkins
 
@@ -1539,8 +1539,8 @@ function bypassQueueEvent(data) {
             var yourProfileSkin = JSON.parse(data.yourProfileSkin);
             var enemyProfileSkin = JSON.parse(data.enemyProfileSkin);
 
-            $('#user' + you.id).css("background-image", "url(../images/profiles/" + yourProfileSkin.image + ".png)");
-            $('#user' + enemy.id).css("background-image", "url(../images/profiles/" + enemyProfileSkin.image + ".png)");
+            $('#user' + you.id).css("background-image", "url(../aprilimages/profiles/" + yourProfileSkin.image + ".png)");
+            $('#user' + enemy.id).css("background-image", "url(../aprilimages/profiles/" + enemyProfileSkin.image + ".png)");
 
             if (data.gameType !== "BOSS") {
                 checkSpecialProfileSkin(yourProfileSkin);
@@ -1574,11 +1574,11 @@ function bypassQueueEvent(data) {
 
 
         if (yourGroups.contains("DETERMINATION")) {
-            $('#yourMainGroup').html("<img src=\"images/rarity/DETERMINATION.png\" title=\"Old Determination Player\" class=\"groupIcon\"/>");
+            $('#yourMainGroup').html("<img src=\"aprilimages/rarity/DETERMINATION.png\" title=\"Old Determination Player\" class=\"groupIcon\"/>");
         }
 
         if (enemyGroups.contains("DETERMINATION")) {
-            $('#enemyMainGroup').html("<img src=\"images/rarity/DETERMINATION.png\" title=\"Old Determination Player\" class=\"groupIcon\"/>");
+            $('#enemyMainGroup').html("<img src=\"aprilimages/rarity/DETERMINATION.png\" title=\"Old Determination Player\" class=\"groupIcon\"/>");
         }
 
         for (var key in handsSize) {
@@ -1606,7 +1606,7 @@ function bypassQueueEvent(data) {
                 customDisplay = '<span class="artifact-custom">' + customValue + '</span>';
             }
 
-            $('#yourArtifacts').append('<span class="artifact-group"><img class="artifact-img ' + disabledClass + '" name="' + yourArtifacts[i].name + '" image="' + yourArtifacts[i].image + '" legendary="' + yourArtifacts[i].legendary + '" artifactId="' + yourArtifacts[i].id + '" src="images/artifacts/' + yourArtifacts[i].image + '.png"/> ' + customDisplay + '</span>');
+            $('#yourArtifacts').append('<span class="artifact-group"><img class="artifact-img ' + disabledClass + '" name="' + yourArtifacts[i].name + '" image="' + yourArtifacts[i].image + '" legendary="' + yourArtifacts[i].legendary + '" artifactId="' + yourArtifacts[i].id + '" src="aprilimages/artifacts/' + yourArtifacts[i].image + '.png"/> ' + customDisplay + '</span>');
         }
 
         var enemyArtifacts = JSON.parse(data.enemyArtifacts);
@@ -1622,7 +1622,7 @@ function bypassQueueEvent(data) {
                 customDisplay = '<span class="artifact-custom">' + customValue + '</span>';
             }
 
-            $('#enemyArtifacts').append('<span class="artifact-group"><img class="artifact-img ' + disabledClass + '" name="' + enemyArtifacts[i].name + '" image="' + enemyArtifacts[i].image + '" legendary="' + enemyArtifacts[i].legendary + '" artifactId="' + enemyArtifacts[i].id + '" src="images/artifacts/' + enemyArtifacts[i].image + '.png"/> ' + customDisplay + '</span>');
+            $('#enemyArtifacts').append('<span class="artifact-group"><img class="artifact-img ' + disabledClass + '" name="' + enemyArtifacts[i].name + '" image="' + enemyArtifacts[i].image + '" legendary="' + enemyArtifacts[i].legendary + '" artifactId="' + enemyArtifacts[i].id + '" src="aprilimages/artifacts/' + enemyArtifacts[i].image + '.png"/> ' + customDisplay + '</span>');
         }
 
         if (hand !== null) {
@@ -2377,7 +2377,7 @@ function messageTuto() {
 
     switch (countTuto) {
         case 0:
-            message = $.i18n("tutorial-1") + '<br/><br/>' + $.i18n("tutorial-2") + '<br/>' + $.i18n("tutorial-3") + ' : <br/><br/>' + $.i18n("tutorial-4") + '<br/><br/>' + $.i18n("tutorial-5") + '<br/><br/>' + $.i18n("tutorial-6") + ' : <ul><li><img src="images/board/cards.png"/> ' + $.i18n("tutorial-7") + '</li><li><img src="images/board/hand.png"/> ' + $.i18n("tutorial-8") + '</li><li><img src="images/board/gold.png"/> ' + $.i18n("tutorial-9") + '</li></ul>';
+            message = $.i18n("tutorial-1") + '<br/><br/>' + $.i18n("tutorial-2") + '<br/>' + $.i18n("tutorial-3") + ' : <br/><br/>' + $.i18n("tutorial-4") + '<br/><br/>' + $.i18n("tutorial-5") + '<br/><br/>' + $.i18n("tutorial-6") + ' : <ul><li><img src="aprilimages/board/cards.png"/> ' + $.i18n("tutorial-7") + '</li><li><img src="aprilimages/board/hand.png"/> ' + $.i18n("tutorial-8") + '</li><li><img src="aprilimages/board/gold.png"/> ' + $.i18n("tutorial-9") + '</li></ul>';
             break;
         case 1:
             message = $.i18n("tutorial-10") + ' : <ul><li><span class="blue">2</span> : ' + $.i18n("tutorial-11") + '</li><li><span class="red">2</span> : ' + $.i18n("tutorial-12") + '</li><li><span class="green">3</span> : ' + $.i18n("tutorial-13") + '</li></ul>';
@@ -2475,7 +2475,7 @@ function playSound(soundName) {
 
 function playJingle(cardName) {
     if (musicEnabled) {
-        var soundPath = '/musics/cards/' + cardName.split(' ').join('_') + '.ogg';
+        var soundPath = '/aprilmusics/cards/' + cardName.split(' ').join('_') + '.ogg';
         music.pause();
         jingle.pause();
         jingle.removeEventListener('ended', jingleEnd);
@@ -2489,7 +2489,7 @@ function playJingle(cardName) {
 function playBackgroundMusic(musicName) {
     if (musicEnabled) {
 
-        var musicPath = '/musics/themes/' + musicName + '.ogg';
+        var musicPath = '/aprilmusics/themes/' + musicName + '.ogg';
 
         music = new Audio(musicPath);
         music.volume = 0.1;
@@ -2505,7 +2505,7 @@ function playBackgroundMusic(musicName) {
 function playMusic(musicName) {
     if (musicEnabled) {
 
-        var musicPath = '/musics/' + musicName + '.ogg';
+        var musicPath = '/aprilmusics/' + musicName + '.ogg';
 
         music = new Audio(musicPath);
         music.volume = 0.2;
@@ -2526,7 +2526,7 @@ function showEmote(isYou, image) {
             youDoingEmote = true;
 
             $('#yourBubble').show();
-            $('#yourEmote').attr('src', 'images/emotes/' + image + '.png').show();
+            $('#yourEmote').attr('src', 'aprilimages/emotes/' + image + '.png').show();
 
             setTimeout(function () {
                 $('#yourBubble').fadeOut(500);
@@ -2542,7 +2542,7 @@ function showEmote(isYou, image) {
             enemyDoingEmote = true;
 
             $('#enemyBubble').show();
-            $('#enemyEmote').attr('src', 'images/emotes/' + image + '.png').show();
+            $('#enemyEmote').attr('src', 'aprilimages/emotes/' + image + '.png').show();
 
             setTimeout(function () {
                 $('#enemyBubble').fadeOut(500);
@@ -2568,7 +2568,7 @@ function showGameEmotes() {
 
             var emote = gameEmotes[i];
 
-            var chatEmote = '<div style="margin-bottom: 15px;" class="col-sm-2"><img class="pointer" style="height: 48px;" src="images/emotes/' + emote.image + '.png" onclick="sendEmote(\'' + emote.id + '\');" /></div>';
+            var chatEmote = '<div style="margin-bottom: 15px;" class="col-sm-2"><img class="pointer" style="height: 48px;" src="aprilimages/emotes/' + emote.image + '.png" onclick="sendEmote(\'' + emote.id + '\');" /></div>';
             popupContent += chatEmote;
         }
 
@@ -2636,7 +2636,7 @@ function checkLimitedPack(level) {
             title: $.i18n('shop-limited-packs'),
             size: BootstrapDialog.SIZE_WIDE,
             closable: false,
-            message: '<p style="font-size: 36px;">' + title + '</p><br/><div style="text-align: center;"><img class="' + style + '" src="images/' + image + '.png" /></div><br/><br/><div><p>' + text + '</p></div><br/><br/>',
+            message: '<p style="font-size: 36px;">' + title + '</p><br/><div style="text-align: center;"><img class="' + style + '" src="aprilimages/' + image + '.png" /></div><br/><br/><div><p>' + text + '</p></div><br/><br/>',
             buttons: [{
                 label: $.i18n('dialog-check'),
                 cssClass: 'btn-success',
@@ -2792,7 +2792,7 @@ function updateDroppables($card) {
                     if (isNaN(position)) {return;}
                     if (doYouHaveEndgame() && isAffectedByEndgame($card)) {
                         setSwitchAreaAndCard($card, true, true);
-                     } else {
+                    } else {
                         setSwitchAreaAndCard($card, position < 2, position >= 2);
                     }
                     didAlreadyUpdateSwitchThisFrame = true;
@@ -2848,7 +2848,7 @@ function checkSpecialProfileSkin(profileSkin) {
     var profileSkinMusics = ['Vaporwave', 'Spider Party', 'Memories of the Snow', 'Smartopia Arrived'];
 
     if (profileSkinBackgrounds.indexOf(profileSkin.name) > -1) {
-        var backgroundImage = '/images/backgrounds/' + profileSkin.image + '.png';
+        var backgroundImage = '/aprilimages/backgrounds/' + profileSkin.image + '.png';
         $('body').css('background', '#000 url(' + backgroundImage + ') no-repeat');
         $('body').css('background-size', 'cover');
 
@@ -2931,7 +2931,7 @@ function doYouHaveEndgame() {
 }
 
 function isAffectedByEndgame(ele) {
-    var tribe = ele.find(`.cardTribes img[src="images/tribes/PIECE.png"]`);
+    var tribe = ele.find(`.cardTribes img[src="aprilimages/tribes/PIECE.png"]`);
     return tribe.length > 0;
 }
 
