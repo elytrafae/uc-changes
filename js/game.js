@@ -2952,6 +2952,5 @@ function onUpdate() {
 }
 window.requestAnimationFrame(onUpdate);
 
-console.log("Custom game.js!")
 
 /////////////////////////

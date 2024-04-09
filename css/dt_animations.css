@@ -1,0 +1,25 @@
+
+.DTAnimationContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+}
+
+.DTAnimationContainer video {
+    width: 100%!important;
+    height: 100%!important;
+    pointer-events: none;
+}
+
+.DTAnimationLayer_Bottom {
+    z-index: -1;
+}
+
+.DTAnimationLayer_Top {
+    z-index: 999;
+}

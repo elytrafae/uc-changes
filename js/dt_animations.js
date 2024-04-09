@@ -1,13 +1,42 @@
 
-const DT_VIDEO_PREFIX = "/video/dtanims/";
+const DT_VIDEO_PREFIX = "https://github.com/elytrafae/uc-changes/raw/main/test_video/";//"/video/dtanims/";
 const DT_VIDEO_SUFFIX = ".webm";
 
-/**@type {Object.<string,HTMLVideoElement>} */
+const DTAnimationLayer = {
+    BOTTOM: "DTAnimationLayer_Bottom",
+    TOP: "DTAnimationLayer_Top"
+}
+
+class DTAnimationData {
+
+    static DEFAULT = new DTAnimationData();
+
+    constructor() {
+        this._backgroundColor = "#000";
+        this._layer = DTAnimationLayer.TOP;
+    }
+
+    backgroundColor(color) {
+        this._backgroundColor = color;
+        return this;
+    }
+
+    layer(layer) {
+        this._layer = layer;
+        return this;
+    }
+
+}
+
+/**@type {Object.<string,DTAnimationData>} */
 var dtAnimationData = {
 
-    "Meta_Flowey": {}
+    "Meta_Flowey": DTAnimationData.DEFAULT,
+    "The_Heroine": DTAnimationData.DEFAULT
 
 };
+
+/**@type {Object.<string,HTMLVideoElement>} */
 var cachedDTAnimations = {};
 
 var DTAnimationContainer = document.createElement("DIV");
@@ -23,15 +52,16 @@ function PreloadAllDTAnimations() {
 function PreloadDTAnimtaion(name) {
     /**@type {HTMLVideoElement} */
     var video = document.createElement("VIDEO");
+    var source = document.createElement("SOURCE");
     video.controls = false;
     video.onloadstart = function(e) {
         cachedDTAnimations[name] = this;
     }
-    video.onerror = function(e) {
-        console.warn("No DT aniamtion found for " + idName);
+    source.onerror = function(e) { // For some reason, the source is the one dispatching the error
+        console.warn("No DT aniamtion found for " + name);
     }
-    var source = document.createElement("SOURCE");
-    source.src = DT_VIDEO_PREFIX + idName + DT_VIDEO_SUFFIX;
+    
+    source.src = DT_VIDEO_PREFIX + name + DT_VIDEO_SUFFIX;
     video.appendChild(source);
 }
 
@@ -42,6 +72,7 @@ function PlayDTAnimation(/**@type {string} */ name, maxTime = -1, cb = function(
         cb("ERROR");
         return;
     }
+    var data = dtAnimationData[idName];
     [...DTAnimationContainer.children].forEach((child) => {DTAnimationContainer.removeChild(child);});
     DTAnimationContainer.appendChild(video);
     video.currentTime = 0;
@@ -60,7 +91,8 @@ function PlayDTAnimation(/**@type {string} */ name, maxTime = -1, cb = function(
             }
         }, maxTime + 5); // This is to make sure the timeout is not triggered by accident, we give a little leeway
     }
-    DTAnimationContainer.classList.remove("hidden");
+    DTAnimationContainer.style.backgroundColor = data._backgroundColor;
+    DTAnimationContainer.className = "DTAnimationContainer " + data._layer; // Removes "hidden", sets correct layer
 }
 
 PreloadAllDTAnimations();
