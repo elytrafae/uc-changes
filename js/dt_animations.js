@@ -3,32 +3,36 @@ const DT_VIDEO_PREFIX = "/video/dtanims/";
 const DT_VIDEO_SUFFIX = ".webm";
 
 /**@type {Object.<string,HTMLVideoElement>} */
+var dtAnimationData = {
+
+    "Meta_Flowey": {}
+
+};
 var cachedDTAnimations = {};
 
 var DTAnimationContainer = document.createElement("DIV");
 DTAnimationContainer.className = "DTAnimationContainer hidden";
 document.body.appendChild(DTAnimationContainer);
 
-function LoadAllDTAnimations() {
-    allCards.forEach((card) => {
-        if (card.rarity !== "DETERMINATION") {
-            return;
-        }
-        var idName = card.name.replaceAll(" ", "_");
-        /**@type {HTMLVideoElement} */
-        var video = document.createElement("VIDEO");
-        video.controls = false;
-        video.onloadstart = function(e) {
-            cachedDTAnimations[idName] = this;
-        }
-        video.onerror = function(e) {
-            console.warn("No DT aniamtion found for " + idName);
-        }
-        var source = document.createElement("SOURCE");
-        source.src = DT_VIDEO_PREFIX + idName + DT_VIDEO_SUFFIX;
-        video.appendChild(source);
-    })
+function PreloadAllDTAnimations() {
+    for (var key in dtAnimationData) {
+        PreloadDTAnimtaion(key);
+    }
+}
 
+function PreloadDTAnimtaion(name) {
+    /**@type {HTMLVideoElement} */
+    var video = document.createElement("VIDEO");
+    video.controls = false;
+    video.onloadstart = function(e) {
+        cachedDTAnimations[name] = this;
+    }
+    video.onerror = function(e) {
+        console.warn("No DT aniamtion found for " + idName);
+    }
+    var source = document.createElement("SOURCE");
+    source.src = DT_VIDEO_PREFIX + idName + DT_VIDEO_SUFFIX;
+    video.appendChild(source);
 }
 
 function PlayDTAnimation(/**@type {string} */ name, maxTime = -1, cb = function() {}) {
@@ -58,3 +62,5 @@ function PlayDTAnimation(/**@type {string} */ name, maxTime = -1, cb = function(
     }
     DTAnimationContainer.classList.remove("hidden");
 }
+
+PreloadAllDTAnimations();
