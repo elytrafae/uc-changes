@@ -54,6 +54,7 @@ function PreloadDTAnimtaion(name) {
     var video = document.createElement("VIDEO");
     var source = document.createElement("SOURCE");
     video.controls = false;
+    video.preload = "auto";
     video.onloadstart = function(e) {
         cachedDTAnimations[name] = this;
     }
