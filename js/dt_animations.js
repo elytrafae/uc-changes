@@ -69,6 +69,7 @@ function PlayDTAnimation(/**@type {string} */ name, maxTime = -1, cb = function(
     var idName = name.replaceAll(" ", "_"); // This makes sure any version of the name being sent will be correct
     var video = cachedDTAnimations[idName];
     if (!video) {
+        console.warn(`Tried to play animation "${name}", but it's not registered!`);
         cb("ERROR");
         return;
     }
