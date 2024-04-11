@@ -483,7 +483,7 @@ function trueObtainedCard(card) {
     if (card.rarity === 'LEGENDARY' || card.rarity === 'DETERMINATION') {
         var soundPath = '/aprilmusics/cards/' + card.name.split(' ').join('_') + '.ogg';
         var music = new Audio(soundPath);
-        music.volume = 0.3;
+        music.volume = 0.2;
         music.play();
     }
 }
