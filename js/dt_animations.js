@@ -43,10 +43,21 @@ var DTAnimationContainer = document.createElement("DIV");
 DTAnimationContainer.className = "DTAnimationContainer hidden";
 document.body.appendChild(DTAnimationContainer);
 
+var skipButton = document.createElement("BUTTON");
+skipButton.className = "DTAnimationSkipButton btn btn-primary hidden";
+skipButton.innerHTML = $.i18n("animation-skip");
+skipButton.setAttribute("data-i18n", "[html]animation-skip");
+DTAnimationContainer.appendChild(skipButton);
+
 function PreloadAllDTAnimations() {
     for (var key in dtAnimationData) {
         PreloadDTAnimtaion(key);
     }
+}
+
+function DTAnimationExists(name) {
+    var idName = name.replaceAll(" ", "_"); // This makes sure any version of the name being sent will be correct
+    return !!cachedDTAnimations[idName];
 }
 
 function PreloadDTAnimtaion(name) {
@@ -75,7 +86,7 @@ function PlayDTAnimation(/**@type {string} */ name, maxTime = -1, cb = function(
         return;
     }
     var data = dtAnimationData[idName];
-    [...DTAnimationContainer.children].forEach((child) => {DTAnimationContainer.removeChild(child);});
+    [...DTAnimationContainer.children].forEach((child) => {if (child === skipButton) return; DTAnimationContainer.removeChild(child);});
     DTAnimationContainer.appendChild(video);
     video.currentTime = 0;
     video.onended = () => {
@@ -85,6 +96,7 @@ function PlayDTAnimation(/**@type {string} */ name, maxTime = -1, cb = function(
     }
     video.play();
     if (maxTime > 0) {
+        skipButton.classList.add("hidden");
         setTimeout(() => {
             if (!video.paused) {
                 video.pause();
@@ -92,6 +104,13 @@ function PlayDTAnimation(/**@type {string} */ name, maxTime = -1, cb = function(
                 cb("TIMEOUT");
             }
         }, maxTime + 5); // This is to make sure the timeout is not triggered by accident, we give a little leeway
+    } else {
+        skipButton.classList.remove("hidden");
+        skipButton.onclick = () => {
+            video.pause();
+            DTAnimationContainer.classList.add("hidden");
+            cb("SKIP");
+        }
     }
     DTAnimationContainer.style.backgroundColor = data._backgroundColor;
     DTAnimationContainer.className = "DTAnimationContainer " + data._layer; // Removes "hidden", sets correct layer

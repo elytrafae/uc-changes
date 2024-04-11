@@ -16,6 +16,13 @@
     pointer-events: none;
 }
 
+.DTAnimationSkipButton {
+    font-size: 3em;
+    position: absolute;
+    bottom: 0.5em;
+    right: 0.5em;
+}
+
 .DTAnimationLayer_Bottom {
     z-index: -1;
 }
