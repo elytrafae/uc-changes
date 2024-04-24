@@ -82,7 +82,7 @@ function PlayVFXAnimation(name, top, left, height, maxTime, parent = document.bo
     animation.loop = true;
     animation.style = `position: absolute; left: ${left}px; top: ${top}px; z-index: 20; height: ${height}px;`;
 
-    parent.appendChild(aniamtion);
+    parent.appendChild(animation);
     setTimeout(function () {
         animation.remove();
     }, maxTime);
@@ -109,6 +109,9 @@ function healAnimation(target, idTarget) {
         if (target === 'PLAYER') {
             var $hpBar = $('#user' + idTarget + ' .hpBar');
             if ($hpBar.length) {
+                var position = $hpBar.offset();
+                var left = position.left - 22;
+                var top = position.top - 65;
                 PlayVFXAnimation("Heal_Player", top, left, 112, 820);
             }
         } else if (target === 'MONSTER') {
